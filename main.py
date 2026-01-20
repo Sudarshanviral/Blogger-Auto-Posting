@@ -22,8 +22,26 @@ def get_access_token():
     return r.json()["access_token"]
 
 def fetch_topic():
-    url = f"https://newsapi.org/v2/top-headlines?country=us&pageSize=1&apiKey={NEWS_API_KEY}"
-    return requests.get(url).json()["articles"][0]["title"]
+    url = "https://newsapi.org/v2/top-headlines"
+    params = {
+        "country": "us",
+        "pageSize": 5,
+        "apiKey": NEWS_API_KEY,
+    }
+
+    r = requests.get(url, params=params)
+    data = r.json()
+
+    if data.get("status") != "ok":
+        raise Exception(f"NewsAPI error: {data}")
+
+    articles = data.get("articles", [])
+
+    if not articles:
+        return "Breaking News Update"
+
+    return articles[0]["title"]
+
 
 def post_to_blogger(title):
     token = get_access_token()
